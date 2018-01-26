@@ -1,0 +1,26 @@
+{
+    "log": [
+        "*"
+    ],
+    "databases": {
+        "db": {
+            "server": "http://172.17.0.1:8091",
+            "bucket": "mobile_bucket",
+            "enable_shared_bucket_access": true,
+            "import_docs": "continuous",
+          "username": "test",
+          "password": "password",
+            "oidc": {
+                "providers": {
+                    "keycloakimplicit": {
+                        "issuer": "http://keycloak-dm-test-keycloak-03.b5e6.rhm-eng-a.openshiftapps.com/auth/realms/couchbase",
+                        "client_id": "couchbase_mobile",
+                        "validation_key": "1988b030-5d08-45ee-8db6-2827c5f611fa",
+                        "callback_url": "http://192.168.1.5:4984/db/_oidc_callback",
+                        "register": true
+                    }
+                }
+            }
+        }
+    }
+}
