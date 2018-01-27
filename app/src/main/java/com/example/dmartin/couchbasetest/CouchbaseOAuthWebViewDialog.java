@@ -16,6 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 /**
  * Created by dmartin on 26/01/18.
@@ -56,88 +57,44 @@ public class CouchbaseOAuthWebViewDialog extends DialogFragment {
 
         @Override
         public void onPageFinished(WebView view, final String url) {
-            // Lets not follow the redirect for couchbase
-            // See https://developer.couchbase.com/documentation/mobile/1.5/guides/authentication/openid/index.html#build-your-own-login-ui
-            // Just finish up before redirect
-            Log.d("app", String.format("onPageFinished with url %s", url));
-            if (receiver != null) {
-                final OAuthReceiver receiverRef = receiver;
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
+            Log.d("app", String.format("onPageFinished with url %s redirectURL %s", url, redirectURL));
+            if (url.startsWith(redirectURL)) {
+
+                // Lets not follow the redirect for couchbase
+                // See https://developer.couchbase.com/documentation/mobile/1.5/guides/authentication/openid/index.html#build-your-own-login-ui
+                // Just finish up before redirect
+                Log.d("app", String.format("onPageFinished with url %s", url));
+                if (receiver != null) {
+                    final OAuthReceiver receiverRef = receiver;
+                    new Handler(Looper.getMainLooper()).post(() -> {
                         receiverRef.receiveLoginAttempted(url);
-                    }
-                });
-            }
-//            if (url.startsWith(redirectURL)) {
-
-//                if (url.contains("code=")) {
-//                    final String token = fetchToken(url);
-//                    Log.d("TOKEN", token);
-//                    if (receiver != null) {
-//                        final CouchbaseOAuthWebViewDialog.OAuthReceiver receiverRef = receiver;
-//                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                receiverRef.receiveOAuthCode(token);
-//                            }
-//                        });
-//                    }
-//                    return;
-//                } else if (url.contains("error=")) {
-//                    final String error = fetchError(url);
-//                    Log.d("ERROR", error);
-//                    if (receiver != null) {
-//                        final CouchbaseOAuthWebViewDialog.OAuthReceiver receiverRef = receiver;
-//                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                receiverRef.receiveOAuthError(error);
-//                            }
-//                        });
-//                    }
-//                    return;
-//                }
+                    });
+                }
+                return;
             }
 
-//            super.onPageFinished(view, url);
+            super.onPageFinished(view, url);
+        }
 
-//        }
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, final String url) {
+            Log.d("app", String.format("shouldOverrideUrlLoading with url %s redirectURL %s", url, redirectURL));
+            if (url.startsWith(redirectURL)) {
 
-//        @Override
-//        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//            if (url.startsWith(redirectURL)) {
-//                if (url.contains("code=")) {
-//                    final String token = fetchToken(url);
-//                    Log.d("TOKEN", token);
-//                    if (receiver != null) {
-//                        final CouchbaseOAuthWebViewDialog.OAuthReceiver receiverRef = receiver;
-//                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                receiverRef.receiveOAuthCode(token);
-//                            }
-//                        });
-//                    }
-//                    return true;
-//                } else if (url.contains("error=")) {
-//                    final String error = fetchError(url);
-//                    Log.d("ERROR", error);
-//                    if (receiver != null) {
-//                        final CouchbaseOAuthWebViewDialog.OAuthReceiver receiverRef = receiver;
-//                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                receiverRef.receiveOAuthError(error);
-//                            }
-//                        });
-//                    }
-//                    return true;
-//                }
-//            }
-//            return false;
-//
-//        }
+                // Lets not follow the redirect for couchbase
+                // See https://developer.couchbase.com/documentation/mobile/1.5/guides/authentication/openid/index.html#build-your-own-login-ui
+                // Just finish up before redirect
+                Log.d("app", String.format("shouldOverrideUrlLoading with url %s", url));
+                if (receiver != null) {
+                    final OAuthReceiver receiverRef = receiver;
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        receiverRef.receiveLoginAttempted(url);
+                    });
+                }
+                return true;
+            }
+            return false;
+        }
 
         private String fetchToken(String url) {
             return fetchURLParam(url, "code");
