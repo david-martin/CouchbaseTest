@@ -1,7 +1,8 @@
 # Setup
 
-## Couchbase Server
+## Couchbase Server (Optional)
 
+Start couchbase server if you intend to hook up the sync gateway to it. (Alternative is an in-memory db in the sync gateway).
 ```bash
 docker run   --ulimit nofile=70000:70000   --ulimit core=100000000:100000000   --ulimit memlock=100000000:100000000   -p 8091-8094:8091-8094   -p 11210:11210   --rm   -v $PWD/couchbase_var:/opt/couchbase/var   couchbase/server:community-5.0.1
 ```
@@ -13,14 +14,24 @@ docker run   --ulimit nofile=70000:70000   --ulimit core=100000000:100000000   -
 
 ## Sync Gateway
 
+To start using the sync gateway with the couchbase server:
 ```bash
 docker run   -p 4984-4985:4984-4985   --rm   -v $PWD:/tmp/config   couchbase/sync-gateway:1.5.1-community     -adminInterface     :4985     /tmp/config/nc-gateway-config.json
 ```
 
+If you want to just use sync gateway with an in-memory db (walrus):
+```bash
+docker run   -p 4984-4985:4984-4985   --rm   -v $PWD:/tmp/config   couchbase/sync-gateway:1.5.1-community     -adminInterface     :4985     /tmp/config/nc-gateway-config-walrus.json
+```
 
+If using basic auth for access to the gateway, you can create an account in the sync gateway
+```
 curl -vX POST http://localhost:4985/todos/_user/ \
   -H 'Content-Type: application/json' \
   -d '{"name": "adminaccount", "password": "password"}'
+```
+
+If using OIDC, verify the correct details are in the sync-gateway-config.json file
 
 ## Android App
 
@@ -34,7 +45,9 @@ private static final String SYNC_GATEWAY_HOST = "http://192.168.1.5:4984"
 
 Build & Run it on device or an emulator.
 Filter Logcat by 'D/app' to see a new document being created.
-You should see the same document back in the couchbase server
+You should see the same document back in the couchbase server.
+
+If using OIDC ... (WIP)
 
 
 # couchbase notes
@@ -58,5 +71,6 @@ Start Sync Gateway with the following configuration file.
 “import_docs”: “continuous”
 }
 }
-}```
+}
+```
 There are two properties to keep in mind. The enable_shared_bucket_access property is used to disable the default behaviour. And the import_docs property to specify that this Sync Gateway node should perform import processing of incoming documents. Note that in a clustered environment, only 1 node should use the import_docs property.
