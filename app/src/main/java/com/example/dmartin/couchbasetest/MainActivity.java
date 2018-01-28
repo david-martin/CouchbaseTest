@@ -21,6 +21,7 @@ import com.couchbase.lite.QueryRow;
 import com.couchbase.lite.View;
 import com.couchbase.lite.android.AndroidContext;
 import com.couchbase.lite.auth.Authenticator;
+import com.couchbase.lite.auth.AuthenticatorFactory;
 import com.couchbase.lite.auth.OIDCLoginCallback;
 import com.couchbase.lite.auth.OIDCLoginContinuation;
 import com.couchbase.lite.auth.OpenIDConnectAuthenticatorFactory;
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements Replication.Chang
         Replication push = database.createPushReplication(url);
         Replication pull = database.createPullReplication(url);
 
-        //.createBasicAuthenticator("adminaccount", "password");
+//        Authenticator authenticator = AuthenticatorFactory.createBasicAuthenticator("adminaccount", "password");
 //        pull.setAuthenticator(authenticator);
 //        push.setAuthenticator(authenticator);
 

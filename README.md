@@ -10,7 +10,7 @@ docker run   --ulimit nofile=70000:70000   --ulimit core=100000000:100000000   -
 * setup server using web ui at http://localhost:8091
 * create admin user called `admin` with password `password`
 * setup bucket called `mobile_bucket`
-* create a standard user called `test` and password `password`, with * access to buckets
+* create a standard user called `test` and password `password`, with admin access (important to allo
 
 ## Sync Gateway
 
@@ -50,10 +50,17 @@ You should see the same document back in the couchbase server.
 If using OIDC ... (WIP)
 
 
+# Troubleshooting
+
+Sync Gateway error
+```
+2018-01-28T15:19:48.416Z WARNING: 403 Forbidden attempting to access http://172.17.0.1:8091/settings/autoCompaction.  Bucket user must have Bucket Full Access and Bucket Admin roles to retrieve metadata purge interval. -- base.CouchbaseBucketGoCB.retrievePurgeInterval() at bucket_gocb.go:214
+```
+Ensure the Couchbase Server user exists and has 'Admin' permissions (not just bucket permissions).
+
 # couchbase notes
 
 By default, Sync Gateway uses a built-in, in-memory server called "Walrus" that can withstand most prototyping use cases, extending support to at most one or two users. In a staging or production environment, you must connect each Sync Gateway instance to a Couchbase Server cluster.
-
 
 https://forums.couchbase.com/t/authentication-error-when-trying-to-connect-sync-gateway-to-couchbase-server/14559/2
 
